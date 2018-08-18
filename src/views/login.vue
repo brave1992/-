@@ -1,25 +1,26 @@
 <template>
   <div class="login">
-    <el-form ref="form" :model="form" class="container" :rules="rules">
-      <el-form-item>
-        <div class="avatar">
-          <img src="../assets/avatar.jpg" alt="">
-        </div>
-      </el-form-item>
-      <el-form-item prop="username">
-        <el-input v-model="form.username" placeholder="账号" prefix-icon="el-icon-search"></el-input>
-      </el-form-item>
-      <el-form-item prop="password">
-        <el-input v-model="form.password" placeholder="密码" prefix-icon="el-icon-view"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" class="login-btn">登录</el-button>
-      </el-form-item>
-    </el-form>  
+      <el-form ref="form" :model="form" class="container" :rules="rules">
+        <el-form-item>
+          <div class="avatar">
+            <img src="../assets/avatar.jpg" alt="">
+          </div>
+        </el-form-item>
+        <el-form-item prop="username">
+          <el-input v-model="form.username" placeholder="账号" prefix-icon="el-icon-search"></el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input v-model="form.password" placeholder="密码" prefix-icon="el-icon-view" type="password"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" class="login-btn" @click="loginSubmit('form')">登录</el-button>
+        </el-form-item>
+      </el-form>  
   </div>
 </template>
 
 <script>
+import {checkUser} from '@/api'
 export default {
   data() {
     return {
@@ -28,13 +29,33 @@ export default {
         password: ''
       },
       rules: {
-        username: [
-          { required: true, message: '请输入用户名称', trigger: 'blur' },
-              ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
-        ]      
+        username: [{required: true, message: '请输入用户名称', trigger: 'blur' }],
+        password: [{required: true, message: '请输入密码', trigger: 'blur' }]      
       }
+    }
+  },
+  methods: {
+    loginSubmit(formName) {
+      this.$refs[formName].validate(valide => {
+        // console.log(valide)
+        if(valide) {
+          // 只有校验通过才执行函数
+          checkUser(this.form).then(res => {
+            // console.log(res)
+            if(res.meta.status === 200) {
+              this.$router.push({name: 'Home'})
+            } else {
+              // 如果失败,展示提示信息
+              this.$message({
+                type: 'error',
+                message: res.meta.msg
+              })
+            }
+          })
+        } else {
+          console.log('校验不通过')
+        }
+      })
     }
   }
 }

@@ -8,19 +8,6 @@ import router from './router.js'
 
 Vue.use(ElementUI)
 
-router.beforeEach((to, from, next) => {
-  let token = localStorage.getItem('myToken')
-  if (token) {
-    next()
-  } else {
-    if (to.path === '/login') {
-      next()
-    } else {
-      next({ path: '/login' })
-    }
-  }
-})
-
 new Vue({
   render: h => h(App),
   router
