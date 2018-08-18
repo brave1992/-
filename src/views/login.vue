@@ -42,7 +42,9 @@ export default {
           // 只有校验通过才执行函数
           checkUser(this.form).then(res => {
             // console.log(res)
+            // 如果成功要跳转到首页,将token保存到localStorage
             if(res.meta.status === 200) {
+              localStorage.setItem('mytoken',res.data.token)
               this.$router.push({name: 'Home'})
             } else {
               // 如果失败,展示提示信息
