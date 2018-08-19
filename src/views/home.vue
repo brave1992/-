@@ -2,9 +2,10 @@
   <div class="home">
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">
+      <el-aside width="auto">
         <div class="logo"></div>
         <el-menu
+      :collapse="isCollapse"
       default-active="2"
       class="el-menu-admin"
       @open="handleOpen"
@@ -26,8 +27,18 @@
     </el-menu>
       </el-aside>
       <el-container>
-        <el-header>Header</el-header>
-        <el-main>Main</el-main>
+        <el-header>
+          <i class="el-icon-tickets toggle-btn" @click="toggleCollapse"></i>
+          <div class="system-title">电商后台管理系统</div>
+          <div class="welcome">
+            <span>您好,xxx</span>
+            <el-button type="text" @click="loginOut">退出</el-button>
+          </div>
+        </el-header>
+        <!-- 中间内容部分 -->
+        <el-main>
+          <router-view></router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -36,12 +47,26 @@
 <script>
 import {getUserList} from '@/api'
 export default {
+  data() {
+    return {
+      isCollapse: false
+    }
+  },
   methods: {
       handleOpen(key, keyPath) {
         console.log(key, keyPath);
       },
       handleClose(key, keyPath) {
         console.log(key, keyPath);
+      },
+      toggleCollapse() {
+        this.isCollapse = !this.isCollapse
+      },
+      loginOut() {
+        // 清除登录状态,即清除保存在localStorage中的token
+        localStorage.removeItem('mytoken')
+        // 跳转到登录页面
+        this.$router.push({name: 'Login'})
       }
     },
   mounted() {
@@ -74,6 +99,7 @@ export default {
     background-color: #545c64;
   }
   .logo {
+    width: 100%;
     height:60px;
     background: url(../assets/logo.png);
     background-size: cover;
