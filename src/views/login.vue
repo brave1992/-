@@ -10,7 +10,7 @@
           <el-input v-model="form.username" placeholder="账号" prefix-icon="el-icon-search"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="form.password" placeholder="密码" prefix-icon="el-icon-view" type="password"></el-input>
+          <el-input v-model="form.password" placeholder="密码" prefix-icon="el-icon-view" type="password" @keydown.native.enter="loginSubmit('form')"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" class="login-btn" @click="loginSubmit('form')">登录</el-button>
@@ -42,9 +42,10 @@ export default {
           // 只有校验通过才执行函数
           checkUser(this.form).then(res => {
             // console.log(res)
-            // 如果成功要跳转到首页,将token保存到localStorage
+            // 如果成功要跳转到首页,将token保存到localStorage,将username保存到vuex的state中
             if(res.meta.status === 200) {
               localStorage.setItem('mytoken',res.data.token)
+              this.$store.commit('setUsername',res.data.username)
               this.$router.push({name: 'Home'})
             } else {
               // 如果失败,展示提示信息

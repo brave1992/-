@@ -5,8 +5,8 @@
       <el-aside width="auto">
         <div class="logo"></div>
         <el-menu
+      :router='true'
       :collapse="isCollapse"
-      default-active="2"
       class="el-menu-admin"
       @open="handleOpen"
       @close="handleClose" 
@@ -14,12 +14,12 @@
       text-color="#fff"
       active-text-color="#ffd04b"
       >
-      <el-submenu index="1">
+      <el-submenu index='1'>
         <template slot="title">
           <i class="el-icon-location"></i>
           <span>用户管理</span>
         </template>
-          <el-menu-item index="2">
+          <el-menu-item index='/user'>
             <i class="el-icon-menu"></i>
             <span slot="title">用户列表</span>
           </el-menu-item>
@@ -27,11 +27,13 @@
     </el-menu>
       </el-aside>
       <el-container>
+
+        <!-- header部分 -->
         <el-header>
           <i class="el-icon-tickets toggle-btn" @click="toggleCollapse"></i>
           <div class="system-title">电商后台管理系统</div>
           <div class="welcome">
-            <span>您好,xxx</span>
+            <span>您好,{{$store.getters.username}}</span>
             <el-button type="text" @click="loginOut">退出</el-button>
           </div>
         </el-header>
@@ -72,7 +74,7 @@ export default {
   mounted() {
     let params = {params: {query: '', pagenum: '1', pagesize: '1'}}
     getUserList(params).then(res => {
-      console.log(res)
+      // console.log(res)
     })
   }
 }
