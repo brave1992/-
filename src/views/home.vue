@@ -6,7 +6,7 @@
         <div class="logo"></div>
         <el-menu
       :collapse="isCollapse"
-      default-active="2"
+      :router="true"
       class="el-menu-admin"
       @open="handleOpen"
       @close="handleClose" 
@@ -14,12 +14,12 @@
       text-color="#fff"
       active-text-color="#ffd04b"
       >
-      <el-submenu index="1">
+      <el-submenu>
         <template slot="title">
           <i class="el-icon-location"></i>
           <span>用户管理</span>
         </template>
-          <el-menu-item index="2">
+          <el-menu-item index="/user">
             <i class="el-icon-menu"></i>
             <span slot="title">用户列表</span>
           </el-menu-item>
