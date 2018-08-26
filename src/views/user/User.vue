@@ -45,7 +45,7 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" plain icon="el-icon-edit" @click="showEditDialog(scope.row)"></el-button>
-          <el-button size="mini" type="danger" plain icon="el-icon-delete"></el-button>
+          <el-button size="mini" type="danger" plain icon="el-icon-delete" @click="showDeleteDialog(scope.row)"></el-button>
           <el-button size="mini" type="warning" plain icon="el-icon-check"></el-button>
         </template>
       </el-table-column>
@@ -101,11 +101,10 @@
         <el-button type="primary" @click="editUserSubmit('editUserForm')">确 定</el-button>
       </div>
     </el-dialog>
-
   </div>
 </template>
 <script>
-import {getUserList,changeUserState,addUser,getUserById,editUser} from '@/api'
+import {getUserList,changeUserState,addUser,getUserById,editUser,deleterUser} from '@/api'
 export default {
    data() {
       return {
@@ -128,6 +127,7 @@ export default {
           mobile: '',
           id:0
         },
+        deleteDialogVisible: false,
         // 添加用户的表单验证
         rules: {
           username: [
@@ -247,7 +247,34 @@ export default {
             })
           }
         })
+      },
+
+      // 展示删除提示框
+      showDeleteDialog(row) {
+        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 执行删除用户操作
+          deleterUser(row.id).then(res => {
+            console.log(res)
+            if(res.meta.status === 200) {
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              this.initList()
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })          
+        })
       }
+
     }
 }
 </script>
