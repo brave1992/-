@@ -44,7 +44,7 @@
       </el-table-column>        
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" plain icon="el-icon-edit"></el-button>
+          <el-button size="mini" type="primary" plain icon="el-icon-edit" @click="showEditDialog(scope.row)"></el-button>
           <el-button size="mini" type="danger" plain icon="el-icon-delete"></el-button>
           <el-button size="mini" type="warning" plain icon="el-icon-check"></el-button>
         </template>
@@ -55,15 +55,15 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="1"
-        :page-sizes="[1, 2, 3, 4]"
-        :page-size="1"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="10"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total">
       </el-pagination>
     </div>
 
-      <!-- 添加用户对话框 -->
-    <el-dialog title="收货地址" :visible.sync="addDialogFormVisible">
+    <!-- 添加用户对话框 -->
+    <el-dialog title="添加用戶" :visible.sync="addDialogFormVisible">
       <el-form :model="addForm" label-width="80px" :rules="rules" ref="addUserForm">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="addForm.username" auto-complete="off"></el-input>
@@ -83,25 +83,50 @@
         <el-button type="primary" @click="addUserSubmit('addUserForm')">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 编辑用户对话框 -->
+    <el-dialog title="編輯用戶" :visible.sync="editDialogFormVisible">
+      <el-form :model="editForm" label-width="80px" :rules="rules" ref="editUserForm">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="editForm.username" auto-complete="off" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email"  auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" prop="mobile"> 
+          <el-input v-model="editForm.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editDialogFormVisible=false">取 消</el-button>
+        <el-button type="primary" @click="editUserSubmit('editUserForm')">确 定</el-button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
 <script>
-import {getUserList,changeUserState,addUser} from '@/api'
+import {getUserList,changeUserState,addUser,getUserById,editUser} from '@/api'
 export default {
    data() {
       return {
         userList: [],
         query: '',
         total: 0,
-        pageSize: 1,
+        pageSize: 10,
         pagenum: 1,
         addDialogFormVisible: false,
         addForm: {
           username: '',
           password: '',
           email: '',
-          mobile: ''
+          phone: ''
+        },
+        editDialogFormVisible: false,
+        editForm: {
+          username: '',
+          email: '',
+          mobile: '',
+          id:0
         },
         // 添加用户的表单验证
         rules: {
@@ -179,6 +204,45 @@ export default {
                 })
               } 
               this.addDialogFormVisible = false 
+              this.initList()
+            })
+          }
+        })
+      },
+
+      // 顯示編輯用戶對話框
+      showEditDialog(row) {
+        this.editDialogFormVisible = true
+        console.log(row)
+        getUserById(row.id).then(res => {
+          console.log(res)
+          if(res.meta.status === 200) {
+            this.editForm.username = res.data.username
+            this.editForm.email = res.data.email
+            this.editForm.mobile = res.data.mobile
+            this.editForm.id = res.data.id
+          }
+        })
+      },
+
+      // 編輯用戶提交   formName是我們定義好的DOM引用?
+      editUserSubmit(formName) {
+        this.$refs[formName].validate(valide => {
+          if(valide) {
+            editUser(this.editForm).then(res => {
+              console.log(res)
+              if(res.meta.status === 200) {
+                this.$message({
+                  message: '編輯用戶成功',
+                  type: 'success'
+                })
+              } else {
+                this.$message({
+                  message: '編輯用戶失敗',
+                  type: 'warning'
+                })
+              }
+              this.editDialogFormVisible = false
               this.initList()
             })
           }
