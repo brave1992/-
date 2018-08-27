@@ -18,7 +18,9 @@
         <el-button type="success" plain @click="addDialogFormVisible=true">添加用户</el-button>
       </el-col>
     </el-row> 
-    <el-table
+    <el-table 
+      class="margin-20"
+      v-loading="loading"
       :data="userList"
       border
       style="width: 100%">
@@ -46,7 +48,7 @@
         <template slot-scope="scope">
           <el-button size="mini" type="primary" plain icon="el-icon-edit" @click="showEditDialog(scope.row)"></el-button>
           <el-button size="mini" type="danger" plain icon="el-icon-delete" @click="showDeleteDialog(scope.row)"></el-button>
-          <el-button size="mini" type="warning" plain icon="el-icon-check"></el-button>
+          <el-button size="mini" type="warning" plain icon="el-icon-check" @click="showGrantDialog(scope.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -101,13 +103,32 @@
         <el-button type="primary" @click="editUserSubmit('editUserForm')">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" :visible.sync="grantDialogFormVisible">
+      <el-form :model="grantForm" label-width="100px">
+        <el-form-item label="当前的用户:" prop="username">
+          <el-tag type="info">{{grantForm.username}}</el-tag>
+        </el-form-item>
+        <el-form-item label="请选择角色:">
+          <el-select v-model="roleId" placeholder="请选择角色">
+            <el-option v-for="(role,index) in roleList" :key="index" :label="role.roleName" :value="role.id"></el-option>
+          </el-select> 
+        </el-form-item>
+      </el-form>
+      {{roleId}}
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="grantDialogFormVisible=false">取 消</el-button>
+        <el-button type="primary" @click="grantUserSubmit()">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import {getUserList,changeUserState,addUser,getUserById,editUser,deleterUser} from '@/api'
+import {getUserList,changeUserState,addUser,getUserById,editUser,deleterUser,getRoleList,grantUserRole} from '@/api'
 export default {
    data() {
       return {
+        loading: false,
         userList: [],
         query: '',
         total: 0,
@@ -128,6 +149,10 @@ export default {
           id:0
         },
         deleteDialogVisible: false,
+        grantDialogFormVisible: false,
+        grantForm: {},
+        roleList: [],
+        roleId: '',
         // 添加用户的表单验证
         rules: {
           username: [
@@ -164,10 +189,19 @@ export default {
       },
       // 初始化表格数据
       initList() {
+        this.loading = true
         getUserList({params:{query: this.query, pagenum: this.pagenum, pagesize: this.pageSize}}).then(res => {
           console.log(res)
-          this.userList = res.data.users
-          this.total = res.data.total
+          if(res.meta.status === 200) {
+            this.userList = res.data.users
+            this.total = res.data.total
+            this.loading = false
+          } else {
+            this.$message({
+              message: '加载用户信息失败',
+              type: 'error'
+            })
+          }
         })
       },
 
@@ -224,7 +258,6 @@ export default {
           }
         })
       },
-
       // 編輯用戶提交   formName是我們定義好的DOM引用?
       editUserSubmit(formName) {
         this.$refs[formName].validate(valide => {
@@ -273,13 +306,55 @@ export default {
             message: '已取消删除'
           })          
         })
+      },
+    
+      // 显示分配角色对话框
+      showGrantDialog(row) {
+        this.grantForm = row
+        this.grantDialogFormVisible = true
+        // 获取用户权限列表
+        getRoleList().then(res => {
+          console.log(res)
+          if(res.meta.status === 200) {
+            this.roleList = res.data
+          }
+        })
+      },
+      // 分配角色
+      grantUserSubmit() {
+        if(!this.roleId) {
+          this.$message({
+            message: '角色不能为空,请选择',
+            type: 'warning'
+          })
+        } else {
+            grantUserRole({id:this.grantForm.id, rid: this.roleId}).then(res => {
+            console.log(res)
+            if(res.meta.status === 200) {
+              this.$message({
+                message: '设置角色成功',
+                type: 'success'
+              })
+            } else {
+              this.$message({
+                message: res.meta.msg,
+                type: 'error'
+              })
+            }
+            this.grantDialogFormVisible = false
+            this.initList()
+          })
+        }
+        
       }
-
     }
 }
 </script>
 <style lang="scss" scoped>
 .user {
+  .margin-20 {
+    margin: 20px 0
+  }
   .search-input {
     width: 300px;
   }
@@ -288,5 +363,6 @@ export default {
     background-color: #D3DCE6;
   }
 }
+
 </style>
 
