@@ -15,11 +15,35 @@
         <el-table :data="roleList" style="width: 100%" border class="mt-20">
             <el-table-column type="expand">
             <template slot-scope="scope">
-                <div>这里是要替换的</div>
+                    <el-row v-for="firstChildren in scope.row.children" :key="firstChildren.id">
+                        <el-col :span="3">
+                            <el-tag closable el-icon-arrow-right>
+                                {{firstChildren.authName}}
+                            </el-tag>
+                            <i class="el-icon-arrow-right" v-if="firstChildren.children.length !== 0 "></i>
+                        </el-col>
+                        <el-col :span="21">
+                            <el-row v-for="secondChildren in firstChildren.children" :key="secondChildren.id">
+                                <el-col :span="4">
+                                    <el-tag closable type='success'>
+                                        {{secondChildren.authName}}
+                                    </el-tag> 
+                                    <i class="el-icon-arrow-right" v-if="secondChildren.children.length !== 0 "></i>  
+                                </el-col>
+                                <el-col :span="20">
+                                    <el-tag closable type='warning'  
+                                    v-for="thirdChildren in secondChildren.children"
+                                    :key="thirdChildren.id">
+                                        {{thirdChildren.authName}}
+                                    </el-tag>
+                                </el-col>
+                            </el-row>
+                        </el-col>
+                    </el-row>
             </template>
             </el-table-column>
-            <el-table-column label="角色名称" prop="roleName"></el-table-column>
-            <el-table-column label="描述" prop="roleDesc"></el-table-column>
+            <el-table-column label="角色名称" prop="roleName" width="163px"></el-table-column>
+            <el-table-column label="描述" prop="roleDesc" width="163px"></el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
                 <el-button size="mini" type="primary" plain icon="el-icon-edit"></el-button>
@@ -52,5 +76,10 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-
+    .role {
+        .el-tag {
+            margin-right: 5px;
+            margin-bottom: 5px
+        }
+    }    
 </style>
