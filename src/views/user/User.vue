@@ -345,7 +345,6 @@ export default {
             this.initList()
           })
         }
-        
       }
     }
 }
