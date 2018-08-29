@@ -55,8 +55,6 @@
                 </el-form-item>
             </el-form>
 
-                
-
             <div slot="footer" class="dialog-footer">
                 <el-button @click="addDialogFormVisible=false">取 消</el-button>
                 <el-button type="primary" @click="addCatSubmit('addCatForm')">确 定</el-button>
@@ -66,12 +64,14 @@
 </template>
 <script>
 import TreeGrid from '@/components/TreeGrid/TreeGrid'
-import {getCategories} from '@/api'
+import {getCategories, addCategories} from '@/api'
 export default {
     data() {
-        return {
+        return { 
             addForm: {
-                cat_name: ''
+                cat_name: '',
+                cat_leve: 0,
+                cat_pid: 0
             },
             options: [], //级联选择器的数据源
             selectedOptions: [], // 级联选择器选中后的数据
@@ -151,6 +151,34 @@ export default {
                     console.log(res)
                     this.options = res.data
                 }
+            })
+        },
+        addCatSubmit(formName) {
+            this.$refs[formName].validate(valide => {
+                if(valide) {
+                    if(this.selectedOptions.length === 0) {
+                        this.addForm.cat_leve = 0
+                        this.addForm.cat_pid = 0
+                    } else if(this.selectedOptions.length === 1) {
+                        this.addForm.cat_leve = 1
+                        this.addForm.cat_pid = this.selectedOptions[this.selectedOptions.length - 1]
+                    } else {
+                        this.addForm.cat_leve = 2
+                        this.addForm.cat_pid = this.selectedOptions[this.selectedOptions.length - 1]
+                    }
+                    addCategories(this.addForm).then(res => {
+                        if(res.meta.status === 201) {
+                            console.log(res)
+                            this.addDialogFormVisible = false
+                            this.initList()
+                            this.$message({
+                                message: res.meta.msg,
+                                type: 'success'
+                            })
+                        }
+                    })
+                }
+                
             })
         }
     }   
