@@ -5,14 +5,9 @@
       <el-aside width="auto">
         <div class="logo"></div>
         <el-menu
-<<<<<<< HEAD
       :unique-opened="true"
       :collapse="isCollapse"
       :router="true"
-=======
-      :router='true'
-      :collapse="isCollapse"
->>>>>>> master
       class="el-menu-admin"
       @open="handleOpen"
       @close="handleClose" 
@@ -20,22 +15,13 @@
       text-color="#fff"
       active-text-color="#ffd04b"
       >
-<<<<<<< HEAD
       <!-- 用户管理 -->
       <el-submenu :index="item.path" v-for="item in menusData" :key="item.id">
         <template slot="title" >
-=======
-      <el-submenu index='1'>
-        <template slot="title">
->>>>>>> master
           <i class="el-icon-location"></i>
           <span>{{item.authName}}</span>
         </template>
-<<<<<<< HEAD
           <el-menu-item :index="tag.path" v-for="tag in item.children" :key="tag.id">
-=======
-          <el-menu-item index='/user'>
->>>>>>> master
             <i class="el-icon-menu"></i>
             <span slot="title">{{tag.authName}}</span>
           </el-menu-item>
