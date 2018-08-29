@@ -52,10 +52,22 @@
                 <template slot-scope="scope">
                 <el-button size="mini" type="primary" plain icon="el-icon-edit"></el-button>
                 <el-button size="mini" type="danger" plain icon="el-icon-delete"></el-button>
-                <el-button size="mini" type="warning" plain icon="el-icon-check"></el-button>
+                <el-button size="mini" type="warning" plain icon="el-icon-check" title="授权角色" @click="showDialog"></el-button>
                 </template>
             </el-table-column>
         </el-table>
+        
+        <!-- Dialog弹出框 -->
+        <el-dialog title="授权角色" :visible.sync="dialogFormVisible">
+            <!-- :default-expanded-keys="[2, 3]" :default-checked-keys="[5]" -->
+            <el-tree :data="data2" show-checkbox node-key="id"
+             :props="defaultProps">
+            </el-tree>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -64,9 +76,16 @@ export default {
     data() {
         return {
             loading: false,
-            roleList: []
+            roleList: [],
+            dialogFormVisible: false,
+             data2:[],
+             defaultProps: {
+                 children: 'children',
+                 label: 'authName'
+             }
         }
     },
+    
     created() {
         loading: true
         getRoleList().then(res => {
@@ -90,9 +109,26 @@ export default {
                     })
                 }
             })
+        },
+        showDialog() {
+            this.dialogFormVisible = true
+            getRoleList({type: 'list'}).then(res => {
+                if(res.meta.status === 200) {
+                    console.log(res.data[0])
+                    console.log('上一行是res')
+                    this.data2 = res.data
+                    console.log(this.data2)
+                    console.log('上一行是赋值后的this.data2')
+                } else {
+                    this.$message({
+                        message: res.meta.error,
+                        type: 'error'
+                    })
+                }
+            })
         }
     }
-}
+}       
 </script>
 <style lang="scss" scoped>
     .role {
