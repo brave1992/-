@@ -3,9 +3,11 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 import App from './App'
+import './styles/element.scss'
 import './styles/index.scss'
 import './styles/element.scss'
 import router from './router.js'
+import store from './store/store'
 
 Vue.use(ElementUI)
 
@@ -28,5 +30,6 @@ router.beforeEach((to, from, next) => {
 
 new Vue({
   render: h => h(App),
-  router
+  router,
+  store
 }).$mount('#app')
