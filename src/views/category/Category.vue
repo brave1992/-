@@ -31,18 +31,22 @@
             :current-page="1"
             :page-sizes="[10, 20, 30, 40]"
             :page-size="10"
-            layout="total, sizes, prev, pager, next, jumper">
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
             </el-pagination>
         </div>
     </div>
 </template>
 <script>
 import TreeGrid from '@/components/TreeGrid/TreeGrid'
+import {getCategories} from '@/api'
 export default {
     data() {
         return {
             addDialogFormVisible: false,
             dataSource: [],
+            pagenum: 1,
+            pagesize: 10,
             columns: [{
             text: '分类名称',
             dataIndex: 'cat_name',
@@ -55,12 +59,16 @@ export default {
             text: '排序',
             dataIndex: 'cat_level',
             width: ''
-            }]
+            }],
+            total: 0
         }
     },
     // 注入组件
     components: {
         TreeGrid
+    },
+    created() {
+        this.initList()
     },
     methods: {
         // TreeGrid相关函数
@@ -72,11 +80,25 @@ export default {
         },
         // 分页处理函数
         handleSizeChange(val) {
-        console.log(`每页 ${val} 条`)
+            console.log(`每页 ${val} 条`)
+            this.pagesize = val
+            this.initList()
         },
         handleCurrentChange(val) {
             console.log(`当前页: ${val}`)
+            this.pagenum = val
+            this.initList()
         },
+        //初始化表格数据
+        initList() {
+            getCategories({type:'3', pagenum: this.pagenum, pagesize: this.pagesize }).then(res => {
+                if(res.meta.status === 200) {
+                    console.log(res)
+                     this.total = res.data.total
+                     this.dataSource = res.data.result
+                }
+            })
+        }
     }   
 }
 </script>
