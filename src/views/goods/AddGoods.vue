@@ -9,6 +9,7 @@
                 </el-breadcrumb>
             </el-col>
         </el-row>
+        <!-- 步骤条 -->
         <el-steps  :active="active" finish-status="success">
             <el-step title="步骤 1"></el-step>
             <el-step title="步骤 2"></el-step>
@@ -16,11 +17,23 @@
             <el-step title="步骤 4"></el-step>
             <el-step title="步骤 5"></el-step> 
         </el-steps>
+        <!-- tab组件 -->
         <el-tabs v-model="activeName" @tab-click="handleClick" tab-position="left" class="p-20">
             <el-tab-pane label="基本信息" name="first">基本信息</el-tab-pane>
             <el-tab-pane label="商品参数" name="second">商品参数</el-tab-pane>
             <el-tab-pane label="商品属性" name="third">商品属性</el-tab-pane>
-            <el-tab-pane label="商品图片" name="fourth">商品图片</el-tab-pane>
+            <el-tab-pane label="商品图片" name="fourth">
+                <el-upload
+                action="http://localhost:8888/api/private/v1/upload"
+                :headers="setHeader()"
+                :on-success="handleSucess"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                list-type="picture">
+                <el-button size="small" type="primary">点击上传</el-button>
+                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                </el-upload>
+            </el-tab-pane>
             <el-tab-pane label="商品内容" name="fifth">商品内容</el-tab-pane>
         </el-tabs>
     </div>
@@ -56,6 +69,27 @@ export default {
                 this.active = 0
                 break
         }
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      handleSucess(response, file, fileList) {
+          console.log(response)
+          console.log(file)
+          console.log(fileList)
+          if(response.meta.status === 200) {
+              this.$message({
+                  type: 'success',
+                  message: response.meta.msg
+              })
+          }
+      },
+      setHeader() {
+        let token = localStorage.getItem('mytoken')
+        return {Authorization: token}
       }
     }
 }
